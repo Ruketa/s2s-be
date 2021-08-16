@@ -1,0 +1,26 @@
+@startuml
+
+package "DB" <<Rectangle>> {
+  class database
+  class model
+  class cruds
+  class schemas
+  class initialize
+}
+class main
+package "routers" <<Rectangle>> {
+  class api
+  class health
+}
+
+database <|-- model
+cruds o--> model
+cruds o--> schemas
+main o--> api
+main o--> health
+main --> initialize
+main --> database
+api --> cruds
+api --> schemas
+initialize --> database
+@enduml
