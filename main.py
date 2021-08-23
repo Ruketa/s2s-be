@@ -9,7 +9,7 @@ from db.database import engine
 # router
 from routers import api, health
 
-logger = getLogger(__name__)
+logger = getLogger('uvicorn')  
 
 initialize.initialize_table(engine=engine, checkfirst=True)
 
