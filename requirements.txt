@@ -1,0 +1,8 @@
+uvicorn
+fastapi
+starlette
+sqlalchemy
+uuid
+configparser
+pydantic
+typing
