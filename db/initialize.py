@@ -2,7 +2,7 @@ from logging import getLogger
 
 from db.database import Base
 
-logger = getLogger(__name__)
+logger = getLogger("uvicorn")
 
 def create_tables(engine, checkfirst: bool = True):
   logger.info("Initialize tables if not exist.")
