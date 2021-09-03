@@ -6,7 +6,7 @@ import MeCab
 with open("inja.txt", mode="rt", encoding="utf-8") as f:
   cloud_text = f.read()
 
-tagger = MeCab.Tagger()
+tagger = MeCab.Tagger("")
 tagger.parse("")
 
 start = time.time()
@@ -23,7 +23,9 @@ word_chain = " ".join(wl)
 
 #print (word_chain)
 word_cloud = WordCloud(
-  font_path="./font/SourceHanSerifK-Light.otf"
+  font_path="./font/SourceHanSerifK-Light.otf",
+  background_color="white",
+  colormap="tab20"
 ).generate(word_chain)
 elapsed = time.time() - start
 

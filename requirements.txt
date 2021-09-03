@@ -6,3 +6,7 @@ uuid
 configparser
 pydantic
 typing
+wordcloud
+MeCab
+mecab-python3
+unidic-lite
