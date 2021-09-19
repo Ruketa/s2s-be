@@ -1,129 +1,76 @@
 package db
 
 import (
-	"fmt"
-	"database/sql"
-	_ "github.com/lib/pq"
+	"goapi/entity"
+	"strconv"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gopkg.in/ini.v1"
 )
 
-type questionnaire struct{
-	Id string `json:"id"`
-	Satisfaction_level int `json:"satisfaction_level"`
-	Recommendation_level int `json:"recommendation_level"`
-	Topics string `json:"topics"`
-	Participation_level int `json:"participation_level"`
-	Presentation_level int `json:"presentation_level"`
-	Free_comment string `json:"free_comment"`
-	Holding_num int `json:"holding_num"`
+var (
+	db  *gorm.DB
+	err error
+)
+
+type ConfigList struct {
+	Host     string
+	Database string
+	User     string
+	Port     int
+	Password string
 }
 
-func checkError(err error) {
+// Load config file
+func LoadConfig() *ConfigList {
+	cfg, err := ini.Load("./db/dbconfig.ini")
 	if err != nil {
+		panic(err)
+	}
+	return &ConfigList{
+		Host:     cfg.Section("db").Key("host").String(),
+		Database: cfg.Section("db").Key("database").String(),
+		User:     cfg.Section("db").Key("user").String(),
+		Port:     cfg.Section("db").Key("port").MustInt(),
+		Password: cfg.Section("db").Key("password").String(),
+	}
+}
+
+// InitDB initializes the database connection
+func InitDB() {
+
+	config := LoadConfig()
+
+	db, err = gorm.Open("postgres",
+		"host="+config.Host+
+			" port="+strconv.Itoa(config.Port)+
+			" user="+config.User+
+			" dbname="+config.Database+
+			" password="+config.Password+
+			" sslmode=disable")
+
+	if err != nil {
+		panic(err)
+	}
+
+	db.SingularTable(true)
+	AutoMigrate()
+}
+
+// GetDB returns the database connection
+func GetDB() *gorm.DB {
+	return db
+}
+
+// CloseDB closes the database connection
+func CloseDB() {
+	if err := db.Close(); err != nil {
 		panic(err)
 	}
 }
 
-func Connect() *sql.DB {
-	const (
-		HOST		 = "*"
-		DATABASE = "*"
-		USER     = "*"
-		PORT 		 = 8080 
-		PASSWORD = "*"
-	)
-
-	// initialize connection string
-	var connectionString string = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", HOST, PORT, USER, PASSWORD, DATABASE)
-	fmt.Println(connectionString)
-
-	db, err := sql.Open("postgres", connectionString)
-	checkError(err)
-
-	return db
-}
-
-func CheckConnection(db *sql.DB) {
-	var err = db.Ping()
-	checkError(err)
-	fmt.Println("Successfully created connection to database")
-}
-
-func Close(db *sql.DB) {
-	db.Close()
-}
-
-func CreateTable(db *sql.DB) {
-	var err = db.Ping()
-	checkError(err)
-
-	// questionnaire table
-	var query string = "CREATE TABLE IF NOT EXISTS questions ( ";
-	query = query + "id SERIAL PRIMARY KEY, satisfaction_level INT NOT NULL, ";
-	query = query + "recommendation_level INT NOT NULL, "
-	query = query + "topics Text, "
-	query = query + "participation_level INT NOT NULL, "
-	query = query + "presentation_level INT NOT NULL, "
-	query = query + "free_comment Text, "
-	query = query + "holding_num INT NOT NULL,"
-	query = query + ")"
-			
-	_, err = db.Exec(query)
-	checkError(err)
-
-	// presenter table
-
-}
-
-func SelectQuesionnaire(db *sql.DB)  []questionnaire {
-	sql_select := "SELECT * from questionnaire;"
-	rows, err := db.Query(sql_select)
-	checkError(err)
-	defer rows.Close()
-
-	var qs []questionnaire;
-
-	for rows.Next() {
-		var q questionnaire;
-		err := rows.Scan(
-			&q.Id, 
-			&q.Satisfaction_level,
-			&q.Recommendation_level, 
-			&q.Topics, 
-			&q.Participation_level, 
-			&q.Presentation_level, 
-			&q.Free_comment, 
-			&q.Holding_num);
-		checkError(err)
-
-		qs = append(qs, q)
-	}
-
-	return qs
-}
-
-func SelectQuesionnaireByHoldingNum(db *sql.DB, holding_num string)  []questionnaire {
-	sql_select := "SELECT * from questionnaire WHERE holding_num = " + string(holding_num);
-	rows, err := db.Query(sql_select)
-	checkError(err)
-	defer rows.Close()
-
-	var qs []questionnaire;
-
-	for rows.Next() {
-		var q questionnaire;
-		err := rows.Scan(
-			&q.Id, 
-			&q.Satisfaction_level,
-			&q.Recommendation_level, 
-			&q.Topics, 
-			&q.Participation_level, 
-			&q.Presentation_level, 
-			&q.Free_comment, 
-			&q.Holding_num);
-		checkError(err)
-
-		qs = append(qs, q)
-	}
-
-	return qs
+// AutoMigrate will attempt to automatically migrate all tables
+func AutoMigrate() {
+	db.AutoMigrate(&entity.Questionnaire{}, &entity.PresentationPlan{}, &entity.StudySession{})
 }

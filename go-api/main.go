@@ -1,13 +1,15 @@
 package main
 
-import "goapi/handlers"
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"goapi/db"
+	"goapi/handlers"
+
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
-func main(){
+func main() {
 	engine := gin.Default()
 
 	// CORS
@@ -25,14 +27,21 @@ func main(){
 	group := engine.Group("/api")
 	{
 		group.GET("/questionnaire", handlers.Questionnaire)
+		group.GET("/questionnaire/:holding_num", handlers.QuestionnaireByHoldingNum)
+		group.POST("/questionnaire", handlers.PostQuestionnaire)
 
-		group.GET("/questionnaire/:holding_num", func(c *gin.Context) {
-			holding_num := c.Param("holding_num")
-			handlers.QuestionnaireByHoldingNum(c, holding_num)
-		})
+		group.GET("/presenter", handlers.GetPresenter)
+		group.GET("/presenter/:holding_num", handlers.GetPresenterByHoldingNum)
+		group.POST("/presentation_plan", handlers.PostPresentationPlan)
+
+		group.POST("/session", handlers.PostStudySession)
 	}
+
+	db.InitDB()
 
 	// start server
 	engine.Run(":8000")
 	fmt.Println("Server is running on port 8000")
+
+	defer db.CloseDB()
 }
