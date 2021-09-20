@@ -15,17 +15,18 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type PresentationResult struct {
+	Holding_num        string
+	Event_date         time.Time
+	Presenter          string
+	Presentation_title string
+	Division           string
+}
+
 func GetPresenter(c *gin.Context) {
 	do := db.GetDB()
 
-	type Result struct {
-		Holding_num        string
-		Event_date         time.Time
-		Presenter          string
-		Presentation_title string
-		division           string
-	}
-	results := []Result{}
+	results := []PresentationResult{}
 	do.Table("study_session").
 		Select("study_session.holding_num, study_session.event_date, presentation_plan.presenter, presentation_plan.presentation_title, presentation_plan.division").
 		Joins("left join presentation_plan on study_session.presenter_id = presentation_plan.id").
@@ -41,14 +42,7 @@ func GetPresenter(c *gin.Context) {
 func GetPresenterByHoldingNum(c *gin.Context) {
 	do := db.GetDB()
 
-	type Result struct {
-		Holding_num        string
-		Event_date         time.Time
-		Presenter          string
-		Presentation_title string
-		division           string
-	}
-	results := []Result{}
+	results := []PresentationResult{}
 	do.Table("study_session").
 		Select("study_session.holding_num, study_session.event_date, presentation_plan.presenter, presentation_plan.presentation_title, presentation_plan.division").
 		Joins("left join presentation_plan on study_session.presenter_id = presentation_plan.id").
