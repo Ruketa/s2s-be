@@ -16,7 +16,7 @@ type Questionnaire struct {
 	Holding_num          int    `json:"holding_num"`
 }
 
-// Presenter entity
+// PresentationPan entity
 type PresentationPlan struct {
 	Id                 string    `json:"id"`
 	Presenter          string    `json:"presenter"`

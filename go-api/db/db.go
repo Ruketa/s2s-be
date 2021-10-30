@@ -2,16 +2,15 @@ package db
 
 import (
 	"goapi/entity"
-	"strconv"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	"gopkg.in/ini.v1"
 )
 
 var (
-	db  *gorm.DB
-	err error
+	db *gorm.DB
 )
 
 type ConfigList struct {
@@ -42,19 +41,18 @@ func InitDB() {
 
 	config := LoadConfig()
 
-	db, err = gorm.Open("postgres",
-		"host="+config.Host+
-			" port="+strconv.Itoa(config.Port)+
-			" user="+config.User+
-			" dbname="+config.Database+
-			" password="+config.Password+
-			" sslmode=disable")
-
+	username := config.User
+	password := config.Password
+	dbName := config.Database
+	dbHost := config.Host
+	dns := "user=" + username + " password=" + password + " host=" + dbHost + " dbname=" + dbName + " sslmode=disable"
+	gormDB, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 
-	db.SingularTable(true)
+	db = gormDB
+
 	AutoMigrate()
 }
 
@@ -65,9 +63,11 @@ func GetDB() *gorm.DB {
 
 // CloseDB closes the database connection
 func CloseDB() {
-	if err := db.Close(); err != nil {
+	database, err := db.DB()
+	if err != nil {
 		panic(err)
 	}
+	database.Close()
 }
 
 // AutoMigrate will attempt to automatically migrate all tables

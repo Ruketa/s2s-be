@@ -38,10 +38,9 @@ func main() {
 	}
 
 	db.InitDB()
+	defer db.CloseDB()
 
 	// start server
 	engine.Run(":8000")
 	fmt.Println("Server is running on port 8000")
-
-	defer db.CloseDB()
 }
