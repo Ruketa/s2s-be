@@ -1,0 +1,15 @@
+version: '3.0'
+
+services:
+  server:
+    build : 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - ./src:/goapi/src
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    command:
+      - "go run main.go"
