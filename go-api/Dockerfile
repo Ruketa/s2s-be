@@ -1,7 +1,6 @@
-FROM golang:1.17-alpine
+FROM golang:1.17-alpine as builder
 
 WORKDIR /goapi
-
 RUN apk add --no-cache build-base \
  && apk --no-cache add postgresql-dev \
  && go mod init goapi \
@@ -14,4 +13,15 @@ RUN apk add --no-cache build-base \
  && go get gorm.io/driver/postgres \
  && go get gopkg.in/ini.v1 
 
+COPY . /goapi
+
 EXPOSE 8000
+
+#CMD ["go", "run", "main.go"]
+RUN go build -o goapi main.go
+
+
+FROM alpine:3.10
+COPY --from=builder /goapi/goapi /goapi
+COPY --from=builder /goapi/db/dbconfig.ini /db/dbconfig.ini
+CMD ["./goapi"]
