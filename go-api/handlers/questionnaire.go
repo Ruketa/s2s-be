@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"goapi/db"
 	"goapi/entity"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -48,16 +49,22 @@ func PostQuestionnaire(c *gin.Context) {
 
 	var q entity.Questionnaire
 
-	err := c.BindJSON(&q)
+	err := c.ShouldBindJSON(&q)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
+	// Generate UUID
 	id, err := uuid.NewRandom()
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		panic(err)
 	}
 	q.Id = id.String()
+
+	// Created at
+	q.Created_at = time.Now()
 
 	do.Create(&q)
 

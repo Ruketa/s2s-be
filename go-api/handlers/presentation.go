@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	//"fmt"
-
 	_ "github.com/lib/pq"
 )
 
@@ -26,17 +24,15 @@ type PresentationResult struct {
 func GetPresenter(c *gin.Context) {
 	do := db.GetDB()
 
-	results := []PresentationResult{}
-	do.Table("study_session").
-		Select("study_session.holding_num, study_session.event_date, presentation_plan.presenter, presentation_plan.presentation_title, presentation_plan.division").
-		Joins("left join presentation_plan on study_session.presenter_id = presentation_plan.id").
-		Scan(&results)
+	ps := []entity.PresentationPlan{}
 
-	resultsJson, _ := json.Marshal(results)
+	do.Find(&ps)
+
+	psJson, _ := json.Marshal(ps)
 
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusOK)
-	c.Writer.Write(resultsJson)
+	c.Writer.Write(psJson)
 }
 
 func GetPresenterByHoldingNum(c *gin.Context) {
@@ -66,11 +62,15 @@ func PostPresentationPlan(c *gin.Context) {
 		panic(err)
 	}
 
+	// UUID
 	id, err := uuid.NewRandom()
 	if err != nil {
 		panic(err)
 	}
 	p.Id = id.String()
+
+	// Created at
+	p.Created_at = time.Now()
 
 	db.Create(&p)
 
