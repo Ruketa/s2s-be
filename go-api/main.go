@@ -15,7 +15,7 @@ func main() {
 	// CORS
 	engine.Use(cors.New(cors.Config{
 		// アクセス許可をするドメイン
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"*"},
 		// 許可するHTTPメソッド
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		// 許可するHTTPリクエストヘッダ
