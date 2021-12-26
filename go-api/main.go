@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"goapi/db"
 	"goapi/handlers"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+func router() *gin.Engine {
 	engine := gin.Default()
 
 	// CORS
@@ -26,6 +27,9 @@ func main() {
 
 	group := engine.Group("/api")
 	{
+		group.GET("/healthcheck", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"msg": "ok"})
+		})
 		group.GET("/questionnaire", handlers.Questionnaire)
 		group.GET("/questionnaire/:holding_num", handlers.QuestionnaireByHoldingNum)
 		group.POST("/questionnaire", handlers.PostQuestionnaire)
@@ -37,10 +41,14 @@ func main() {
 		group.POST("/session", handlers.PostStudySession)
 	}
 
+	return engine
+}
+
+func main() {
 	db.InitDB()
 	defer db.CloseDB()
 
 	// start server
-	engine.Run(":8000")
+	router().Run(":8000")
 	fmt.Println("Server is running on port 8000")
 }
