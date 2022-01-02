@@ -1,4 +1,4 @@
-package handlers
+package controllers
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Questionnaire(c *gin.Context) {
+func GetQuestionnaire(c *gin.Context) {
 	do := db.GetDB()
 
 	var qs []entity.Questionnaire
@@ -30,7 +30,7 @@ func Questionnaire(c *gin.Context) {
 	c.Writer.Write(qsJson)
 }
 
-func QuestionnaireByHoldingNum(c *gin.Context) {
+func GetQuestionnaireByHoldingNum(c *gin.Context) {
 	do := db.GetDB()
 
 	var qs []entity.Questionnaire
@@ -44,7 +44,7 @@ func QuestionnaireByHoldingNum(c *gin.Context) {
 	c.Writer.Write(qsJson)
 }
 
-func PostQuestionnaire(c *gin.Context) {
+func CreateQuestionnaire(c *gin.Context) {
 	do := db.GetDB()
 
 	var q entity.Questionnaire

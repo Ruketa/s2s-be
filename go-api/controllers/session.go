@@ -1,7 +1,8 @@
-package handlers
+package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"goapi/db"
 	"goapi/entity"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func PostStudySession(c *gin.Context) {
+func CreateStudySession(c *gin.Context) {
 	do := db.GetDB()
 
 	var ss entity.StudySession
@@ -50,6 +51,8 @@ func GetStudySession(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(string(ssJson))
 
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusOK)
