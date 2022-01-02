@@ -1,9 +1,10 @@
-package handlers
+package controllers
 
 import (
 	"encoding/json"
 	"goapi/db"
 	"goapi/entity"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,7 +16,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Questionnaire(c *gin.Context) {
+func GetQuestionnaire(c *gin.Context) {
 	do := db.GetDB()
 
 	var qs []entity.Questionnaire
@@ -29,7 +30,7 @@ func Questionnaire(c *gin.Context) {
 	c.Writer.Write(qsJson)
 }
 
-func QuestionnaireByHoldingNum(c *gin.Context) {
+func GetQuestionnaireByHoldingNum(c *gin.Context) {
 	do := db.GetDB()
 
 	var qs []entity.Questionnaire
@@ -43,21 +44,27 @@ func QuestionnaireByHoldingNum(c *gin.Context) {
 	c.Writer.Write(qsJson)
 }
 
-func PostQuestionnaire(c *gin.Context) {
+func CreateQuestionnaire(c *gin.Context) {
 	do := db.GetDB()
 
 	var q entity.Questionnaire
 
-	err := c.BindJSON(&q)
+	err := c.ShouldBindJSON(&q)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
+	// Generate UUID
 	id, err := uuid.NewRandom()
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		panic(err)
 	}
 	q.Id = id.String()
+
+	// Created at
+	q.Created_at = time.Now()
 
 	do.Create(&q)
 
