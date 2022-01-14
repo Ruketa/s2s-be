@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
 	"goapi/db"
-	"goapi/entity"
+	model "goapi/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,38 +15,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func GetQuestionnaire(c *gin.Context) {
-	do := db.GetDB()
-
-	var qs []entity.Questionnaire
-
-	do.Find(&qs)
-
-	qsJson, _ := json.Marshal(qs)
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(http.StatusOK)
-	c.Writer.Write(qsJson)
-}
-
-func GetQuestionnaireByHoldingNum(c *gin.Context) {
-	do := db.GetDB()
-
-	var qs []entity.Questionnaire
-
-	do.Where("holding_num = ?", c.Param("holding_num")).Find(&qs)
-
-	qsJson, _ := json.Marshal(qs)
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(http.StatusOK)
-	c.Writer.Write(qsJson)
-}
-
 func CreateQuestionnaire(c *gin.Context) {
 	do := db.GetDB()
 
-	var q entity.Questionnaire
+	var q model.Questionnaire
 
 	err := c.ShouldBindJSON(&q)
 	if err != nil {

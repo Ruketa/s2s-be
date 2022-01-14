@@ -2,7 +2,10 @@ package router
 
 import (
 	"fmt"
-	"goapi/controllers"
+
+	presentation_plan "goapi/controllers/presentation-plans"
+	questionnaire "goapi/controllers/questionnaires"
+	session "goapi/controllers/sessions"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,22 +31,21 @@ func Setup(engine *gin.Engine) {
 	setting(engine)
 
 	group := engine.Group("/api")
-	questionnaire := group.Group("/questionnaire")
+	group_q := group.Group("/questionnaire")
 	{
-		questionnaire.GET("", controllers.GetQuestionnaire)
-		questionnaire.GET("/:holding_num", controllers.GetQuestionnaireByHoldingNum)
-		questionnaire.POST("", controllers.CreateQuestionnaire)
+		group_q.GET("", questionnaire.GetQuestionnaire)
+		group_q.GET("/:holding_num", questionnaire.GetQuestionnaireByHoldingNum)
+		group_q.POST("", questionnaire.CreateQuestionnaire)
 	}
-	presentationPlan := group.Group("/presentation_plan")
+	group_p := group.Group("/presentation_plan")
 	{
-		presentationPlan.GET("", controllers.GetPresentationPlan)
-		presentationPlan.POST("", controllers.CreatePresentationPlan)
-
+		group_p.GET("", presentation_plan.GetPresentationPlan)
+		group_p.POST("", presentation_plan.CreatePresentationPlan)
 	}
-	studySession := group.Group("/study_session")
+	group_s := group.Group("/study_session")
 	{
-		studySession.GET("", controllers.GetStudySession)
-		studySession.POST("", controllers.CreateStudySession)
+		group_s.GET("", session.GetStudySession)
+		group_s.POST("", session.CreateStudySession)
 	}
 
 	engine.GET("/healthcheck", func(c *gin.Context) {
