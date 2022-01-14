@@ -1,7 +1,7 @@
 package db
 
 import (
-	"goapi/entity"
+	model "goapi/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -72,5 +72,5 @@ func CloseDB() {
 
 // AutoMigrate will attempt to automatically migrate all tables
 func AutoMigrate() {
-	db.AutoMigrate(&entity.Questionnaire{}, &entity.PresentationPlan{}, &entity.StudySession{})
+	db.AutoMigrate(&model.Questionnaire{}, &model.PresentationPlan{}, &model.StudySession{})
 }

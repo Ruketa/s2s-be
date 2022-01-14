@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
 	"goapi/db"
-	"goapi/entity"
+	model "goapi/models"
 	"net/http"
 	"time"
 
@@ -13,24 +12,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func GetPresentationPlan(c *gin.Context) {
-	do := db.GetDB()
-
-	var ps []entity.PresentationPlan
-
-	do.Find(&ps)
-
-	psJson, _ := json.Marshal(ps)
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(http.StatusOK)
-	c.Writer.Write(psJson)
-}
-
 func CreatePresentationPlan(c *gin.Context) {
 	db := db.GetDB()
 
-	var p entity.PresentationPlan
+	var p model.PresentationPlan
 
 	err := c.BindJSON(&p)
 	if err != nil {

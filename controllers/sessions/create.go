@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"goapi/db"
-	"goapi/entity"
+	model "goapi/models"
 	"net/http"
 	"time"
 
@@ -17,7 +15,7 @@ import (
 func CreateStudySession(c *gin.Context) {
 	do := db.GetDB()
 
-	var ss entity.StudySession
+	var ss model.StudySession
 
 	err := c.BindJSON(&ss)
 	if err != nil {
@@ -38,23 +36,4 @@ func CreateStudySession(c *gin.Context) {
 
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusOK)
-}
-
-func GetStudySession(c *gin.Context) {
-	do := db.GetDB()
-
-	var ss []entity.StudySession
-
-	do.Find(&ss)
-
-	ssJson, err := json.Marshal(ss)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(ssJson))
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(http.StatusOK)
-	c.JSON(http.StatusOK, ssJson)
 }
